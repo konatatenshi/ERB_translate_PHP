@@ -6,6 +6,15 @@ $filename = str_replace('/','_',$url);
 $filename = str_replace('\\','_',$filename);
 $filename = isset($_GET["upload"])?$_GET["upload"]:$filename;
 $url = str_ireplace(".erb", "", $url);
+if (!file_exists('fanyi')){
+	mkdir ('fanyi',0777,true);
+}
+if (!file_exists('uploads')){
+	mkdir ('uploads',0777,true);
+}
+if (!file_exists('ERB')){
+	die("请将需要汉化游戏目录的ERB文件夹移动到此php文件处然后通过translate.php?fname=(ERB路经)来访问修改汉化erb文件!");
+}
 if(empty($password)){
 	echo '请输入密码以便访问该文件。可将密码告诉他人从而多人协助编辑。勿输入特殊字符避免无法访问。';
 	echo "<form action=\"translate.php?fname=".$url."\" method=\"POST\">";
