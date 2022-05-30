@@ -23,7 +23,7 @@ if(file_exists($filefinal)){
 }else{
 	//echo $filefinal.' 不存在！';
 	$file = file_get_contents('C:\\wwwroot\\121.37.84.45\\ERB\\'.$url.'.ERB');
-	$pattern = "/\r\n(?<!;)([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s*)([\S\'\"]+)/";
+	$pattern = "/\r\n(?<!;)([ \f\t\v]*)PRIN(\w+)([ \f\t\v]*)([\S\'\"]+)/";
 	$replacement = "\r\n;".'${1}PRIN${2}${3}${4}${5}${0}';
 	$file2 = preg_replace($pattern,$replacement,$file);
 	$myfile = fopen("fanyi\\".$filename.$password.".ERB", "w") or die("错误!");
@@ -55,6 +55,8 @@ if(isset($_GET["down"])){
 }elseif(isset($_GET["save"])){
 	$yuanwen = isset($_GET["yuanwen"])?$_GET["yuanwen"]:'';
 	$fanyi = isset($_GET["fanyi"])?$_GET["fanyi"]:'';
+	$yuanwen = preg_quote($yuanwen);
+	$fanyi = preg_quote($fanyi);
 	$pattern2 = "/;([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)".$yuanwen."\r\n(?<!;)([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)(\S+)/";
 	$replacement2 = ";".'${1}PRIN${2}${3}'.$yuanwen."\r\n".'${4}PRIN${5}${6}'.$fanyi;
 	$strfanyi = preg_replace($pattern2,$replacement2,$file2);
@@ -62,7 +64,7 @@ if(isset($_GET["down"])){
 	fwrite($myfile, $strfanyi);
 	fclose($myfile);
 	echo "{\"code\":200}";
-	//var_dump($strfanyi);
+	//var_dump($pattern2);
 	exit;
 }elseif(isset($_GET["upload"])){
 	$upload = isset($_GET["upload"])?$_GET["upload"]:'';
@@ -74,7 +76,7 @@ if(isset($_GET["down"])){
     }
 	$file3 = file_get_contents("uploads\\".$upload.$password.".ERB");
 	if(!empty($file3)){
-		$cong = 
+		$cong = 0;
 		$pattern2 = "/;([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)(\S+)\r\n(?<!;)([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)(\S+)\r\n/";
 		preg_match_all($pattern2,$file3,$matches);
 		if(empty($matches[8])){
@@ -86,12 +88,12 @@ if(isset($_GET["down"])){
 		$strarr = array();
 		if($cong == 0){
 			foreach ($matches[8] as $k => $v) {
-				$regarr[] = "/;([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)".$matches[4][$k]."\r\n(?<!;)([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)(\S+)/";
+				$regarr[] = "/;([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)".preg_quote($matches[4][$k])."\r\n(?<!;)([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)(\S+)/";
 				$strarr[] = ";".'${1}PRIN${2}${3}'.$matches[4][$k]."\r\n".'${4}PRIN${5}${6}'.$v;
 			}
 		}else{
 			foreach ($matches[4] as $k => $v) {
-				$regarr[] = "/;([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)".$matches[8][$k]."\r\n(?<!;)([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)(\S+)/";
+				$regarr[] = "/;([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)".preg_quote($matches[8][$k])."\r\n(?<!;)([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)(\S+)/";
 				$strarr[] = ";".'${1}PRIN${2}${3}'.$matches[8][$k]."\r\n".'${4}PRIN${5}${6}'.$v;
 			}
 		}
