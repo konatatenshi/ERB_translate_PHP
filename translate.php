@@ -74,13 +74,26 @@ if(isset($_GET["down"])){
     }
 	$file3 = file_get_contents("uploads\\".$upload.$password.".ERB");
 	if(!empty($file3)){
+		$cong = 
 		$pattern2 = "/;([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)(\S+)\r\n(?<!;)([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)(\S+)\r\n/";
 		preg_match_all($pattern2,$file3,$matches);
+		if(empty($matches[8])){
+			$cong = 1;
+			$pattern2 = "/([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)(\S+)\r\n(?<!;)([\xC2\xA0\f\t\v]*);Translated(\w+)(\s)(\S+)\r\n/";//匹配葱神
+			preg_match_all($pattern2,$file3,$matches);
+		}
 		$regarr = array();
 		$strarr = array();
-		foreach ($matches[8] as $k => $v) {
-			$regarr[] = "/;([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)".$matches[4][$k]."\r\n(?<!;)([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)(\S+)/";
-			$strarr[] = ";".'${1}PRIN${2}${3}'.$matches[4][$k]."\r\n".'${4}PRIN${5}${6}'.$v;
+		if($cong == 0){
+			foreach ($matches[8] as $k => $v) {
+				$regarr[] = "/;([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)".$matches[4][$k]."\r\n(?<!;)([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)(\S+)/";
+				$strarr[] = ";".'${1}PRIN${2}${3}'.$matches[4][$k]."\r\n".'${4}PRIN${5}${6}'.$v;
+			}
+		}else{
+			foreach ($matches[4] as $k => $v) {
+				$regarr[] = "/;([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)".$matches[8][$k]."\r\n(?<!;)([\xC2\xA0\f\t\v]*)PRIN(\w+)(\s)(\S+)/";
+				$strarr[] = ";".'${1}PRIN${2}${3}'.$matches[8][$k]."\r\n".'${4}PRIN${5}${6}'.$v;
+			}
 		}
 		$strfanyis = preg_replace($regarr,$strarr,$file2);
 		$myfile = fopen("fanyi\\".$upload.$password.".ERB", "w") or die("{\"code\":400}");
